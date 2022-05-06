@@ -47,4 +47,11 @@ class User extends Authenticatable
         # code...
         return $this->hasOne(UserInformation::class);
     }
+
+    // Mutator Passoword Hash
+    public function setPasswordAttribute($value)
+    {
+        # code...
+        $this->attributes['password'] = bcrypt($value);
+    }
 }
