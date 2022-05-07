@@ -14,7 +14,7 @@ return new class extends Migration {
     {
         Schema::create('user_information', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id')->unllable();
+            $table->unsignedBigInteger('user_id')->unique();
             $table->string('father');
             $table->string('mother');
             $table->date('date_of_birth');

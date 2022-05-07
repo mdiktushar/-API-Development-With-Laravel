@@ -9,6 +9,9 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\UserInformation;
 
+// Request
+use App\Http\Requests\UserInfoRequest;
+
 class UserInfoController extends Controller
 {
     /**
@@ -19,6 +22,14 @@ class UserInfoController extends Controller
     public function index()
     {
         //
+        $users = User::all();
+        return response()->json(
+            [
+                "message" => "List of Users",
+                "users" => $users
+            ],
+            200
+        );
     }
 
     /**
@@ -27,9 +38,29 @@ class UserInfoController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(UserInfoRequest $request)
     {
-        //
+        // Findeing user
+        $user = User::findOrFail(auth()->user()->id);
+        try {
+            //code...
+            $user->userInformation()->create($request->all());
+        } catch (\Throwable $th) {
+            //throw $th;
+            return response()->json(
+                [
+                    "message" => $th
+                ],
+                406
+            );
+        }
+        #Response
+        return response()->json(
+            [
+                'massage'=>'Information Saved'
+            ],
+            200
+        );
     }
 
     /**
@@ -41,6 +72,15 @@ class UserInfoController extends Controller
     public function show($id)
     {
         //
+        $user = User::findOrFail($id);
+        $user->userInformation;
+        return response()->json(
+            [
+                "message" => "user profile",
+                "data" => $user
+            ],
+            200
+        );
     }
 
     /**
@@ -50,9 +90,18 @@ class UserInfoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UserInfoRequest $request)
     {
-        //
+        User::findOrFail(auth()->user()->id)
+            ->userInformation()
+            ->update($request->all());
+    
+        return response()->json(
+            [
+                "message" => "information updated"
+            ],
+            200
+        );
     }
 
     /**
@@ -61,8 +110,15 @@ class UserInfoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy()
     {
         //
+        UserInformation::where("user_id", auth()->user()->id)->delete();
+        return response()->json(
+            [
+                "message"=>"user info deleted"
+            ],
+            200
+        );
     }
 }
