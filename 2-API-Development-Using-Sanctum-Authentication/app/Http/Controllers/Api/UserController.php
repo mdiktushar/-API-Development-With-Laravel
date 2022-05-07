@@ -80,11 +80,25 @@ class UserController extends Controller
     public function profile(Type $var = null)
     {
         # code...
+        return response()->json(
+            [
+                "message" => "Student Profile",
+                "data" => auth()->user()
+            ],
+            200
+        );
     }
 
     // logout API
     public function logout(Type $var = null)
     {
         # code...
+        auth()->user()->tokens()->delete();
+        return response()->json(
+            [
+                "message"=>"Logged Out"
+            ],
+            200
+        );
     }
 }
