@@ -8,12 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Curses extends Model
 {
     use HasFactory;
-    protected $guarded = [];
+    protected $guarded = [''];
 
-
-    public function user(Type $var = null)
+    public function user()
     {
         # code...
-        $this->belongsTo(User::class);
+        return $this->belongsTo(User::class);
     }
 }

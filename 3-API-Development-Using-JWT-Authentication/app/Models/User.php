@@ -64,9 +64,15 @@ class User extends Authenticatable implements JWTSubject
         return [];
     }
 
-    public function curses(Type $var = null)
+    public function curses()
     {
         # code...
-        $this->hasMany(Curses::class);
+        return $this->hasMany(Curses::class);
+    }
+
+    public function setPasswordAttribute($password)
+    {
+        # code...
+        $this->attributes['password'] = bcrypt($password);
     }
 }

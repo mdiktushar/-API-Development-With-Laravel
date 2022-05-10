@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Curses;
 use Illuminate\Http\Request;
 
+use App\Models\User;
+
 class CurseController extends Controller
 {
     /**
@@ -15,6 +17,9 @@ class CurseController extends Controller
     public function index()
     {
         //
+        $user = User::findOrFail(auth()->user()->id);
+        $curses = $user->curses;
+        return response()->json(["data"=>$curses], 200);
     }
 
     /**
@@ -26,6 +31,32 @@ class CurseController extends Controller
     public function store(Request $request)
     {
         //
+        $request->validate([
+            'title'=>'required',
+            'description'=>'required'
+        ]);
+
+        // Findeing user
+        $user = User::findOrFail(auth()->user()->id);
+        try {
+            //code...
+            $user->curses()->create($request->all());
+        } catch (\Throwable $th) {
+            //throw $th;
+            return response()->json(
+                [
+                    "message" => $th
+                ],
+                406
+            );
+        }
+        #Response
+        return response()->json(
+            [
+                'massage'=>'Information Saved'
+            ],
+            200
+        );
     }
 
     /**
@@ -34,9 +65,11 @@ class CurseController extends Controller
      * @param  \App\Models\Curses  $curses
      * @return \Illuminate\Http\Response
      */
-    public function show(Curses $curses)
+    public function show($id)
     {
         //
+        $data = Curses::findOrFail($id);
+        return response()->json($data, 200);
     }
 
     /**
@@ -46,9 +79,32 @@ class CurseController extends Controller
      * @param  \App\Models\Curses  $curses
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Curses $curses)
+    public function update(Request $request, $id)
     {
         //
+        $request->validate([
+            'title'=>'required',
+            'description'=>'required'
+        ]);
+
+        $curses = Curses::findOrFail($id);
+
+        if ($curses->user_id != auth()->user()->id) {
+            return response()->json(['message'=>'you are not authorised to update this'], 401);
+        }
+        try {
+            //code...
+            $curses->update($request->all());
+        } catch (\Throwable $th) {
+            //throw $th;
+            return response()->json(
+                [
+                    "message" => $th
+                ],
+                406
+            );
+        }
+        return response()->json(['message'=>"updated"], 200);
     }
 
     /**
@@ -57,8 +113,26 @@ class CurseController extends Controller
      * @param  \App\Models\Curses  $curses
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Curses $curses)
+    public function destroy($id)
     {
         //
+        $curses = Curses::findOrFail($id);
+
+        if ($curses->user_id != auth()->user()->id) {
+            return response()->json(['message'=>'you are not authorised to update this'], 401);
+        }
+        try {
+            //code...
+            $curses->delete();
+        } catch (\Throwable $th) {
+            //throw $th;
+            return response()->json(
+                [
+                    "message" => $th
+                ],
+                406
+            );
+        }
+        return response()->json(["Message"=>"Deleted"], 200);
     }
 }
