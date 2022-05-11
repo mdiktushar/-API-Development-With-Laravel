@@ -47,4 +47,10 @@ class User extends Authenticatable
         # code...
         return $this->hasMany(Book::class);
     }
+
+    public function setPasswordAttribute($password)
+    {
+        # code...
+        $this->attributes['password'] = bcrypt($password);
+    }
 }

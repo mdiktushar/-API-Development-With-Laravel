@@ -23,11 +23,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('register', [UserController::class, 'register']);
-Route::post('login', [UserController::class, 'logi']);
+Route::post('login', [UserController::class, 'login']);
 
 Route::group(['middleware' => ['auth:api']], function () {
     Route::get('profile', [UserController::class, 'profile']);
-    Route::get('logout', [UserController::class, 'logout']);
+    Route::post('logout', [UserController::class, 'logout']);
 
     Route::get('index', [BookController::class, 'index']);
     Route::post('store', [BookController::class, 'store']);
