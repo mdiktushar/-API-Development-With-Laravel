@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
+use App\Models\User;
 use Illuminate\Http\Request;
+use App\Http\Requests\BookRequest;
 
 class BookController extends Controller
 {
@@ -14,7 +16,15 @@ class BookController extends Controller
      */
     public function index()
     {
-        //
+        $books = Book::all();
+        
+        return response()->json(
+            [
+                'message' => 'book list',
+                'data' => $books
+            ],
+            200
+        );
     }
 
     /**
@@ -23,9 +33,17 @@ class BookController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(BookRequest $request)
     {
         //
+        User::findOrFail(auth()->user()->id)->book()->create($request->all());
+
+        return response()->json(
+            [
+                'message' => 'book created'
+            ],
+            200
+        );
     }
 
     /**
@@ -34,9 +52,17 @@ class BookController extends Controller
      * @param  \App\Models\Book  $book
      * @return \Illuminate\Http\Response
      */
-    public function show(Book $book)
+    public function show($id)
     {
         //
+        $book = Book::findOrFail($id);
+        return response()->json(
+            [
+                'message' => 'book info',
+                'book' => $book
+            ],
+            200
+        );
     }
 
     /**
@@ -46,9 +72,25 @@ class BookController extends Controller
      * @param  \App\Models\Book  $book
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Book $book)
+    public function update(BookRequest $request, $id)
     {
-        //
+        $user = User::findOrFail(auth()->user()->id);
+        $book = Book::findOrFail($id);
+        if ($book->user_id != auth()->user()->id) {
+            return response()->json(
+                [
+                    'message' => 'Unauthorized'
+                ],
+                401
+            );
+        }
+        $user->book()->update($request->all());
+        return response()->json(
+            [
+                'message' => 'book updated'
+            ],
+            200
+        );
     }
 
     /**
@@ -57,8 +99,24 @@ class BookController extends Controller
      * @param  \App\Models\Book  $book
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Book $book)
+    public function destroy($id)
     {
-        //
+        $user = User::findOrFail(auth()->user()->id);
+        $book = Book::findOrFail($id);
+        if ($book->user_id != auth()->user()->id) {
+            return response()->json(
+                [
+                    'message' => 'Unauthorized'
+                ],
+                401
+            );
+        }
+        $user->book()->delete();
+        return response()->json(
+            [
+                'message' => 'book deleted'
+            ],
+            200
+        );
     }
 }

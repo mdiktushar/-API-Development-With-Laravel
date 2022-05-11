@@ -42,7 +42,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function Book(Type $var = null)
+    public function book()
     {
         # code...
         return $this->hasMany(Book::class);
